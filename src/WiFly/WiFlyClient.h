@@ -1,13 +1,10 @@
-
 // Based on interface defined in Ethernet's Client.h
 
 #ifndef __WIFLY_CLIENT_H__
 #define __WIFLY_CLIENT_H__
 
 #include "Stream.h"
-
 #include "ParsedStream.h"
-
 #include "WiFlyDevice.h"
 
 class WiFlyClient : public Stream {
@@ -15,35 +12,30 @@ class WiFlyClient : public Stream {
   WiFlyClient(uint8_t *ip, uint16_t port);
   WiFlyClient(const char* domain, uint16_t port);
 
-  boolean connect();
+  boolean       connect();
 
-  size_t write(byte value);
-  size_t write(const char *str);
-  size_t write(const uint8_t *buffer, size_t size);
+  size_t        write(byte value);
+  size_t        write(const char *str);
+  size_t        write(const uint8_t *buffer, size_t size);
 
-  int available();
-  int read();
-  void flush(void);
-  int peek();
+  int           available();
+  int           read();
+  void          flush();
+  int           peek();
 
-  bool connected();
-  void stop();
+  bool          connected();
+  void          stop();
 
   operator bool();
 
+  uint8_t *     _ip;
+  uint16_t      _port;
+  const char *  _domain;
 
-  uint8_t *_ip;
-  uint16_t _port;
-
-  const char *_domain;
 private:
-  WiFlyDevice& _WiFly;
-
-
-  bool isOpen;
-
-  ParsedStream stream;
-
+  WiFlyDevice&  _WiFly;
+  bool          isOpen;
+  ParsedStream  stream;
 
   // TODO: Work out why alternate instantiation code in
   //       Server.available() doesn't work and thus requires this:

@@ -1,4 +1,3 @@
-
 // Based on ring buffer implementation in `HardwareSerial`.
 // TODO: Do proper license stuff
 
@@ -7,52 +6,39 @@
 
 #define RX_BUFFER_SIZE 64
 
-#include <string.h>
-
 #if ARDUINO >= 100
 #include <Arduino.h>
 #else
 #include <WProgram.h>
 #endif
 
-//#include "SpiUart.h"
-
 struct ring_buffer {
   unsigned char buffer[RX_BUFFER_SIZE];
-  int head;
-  int tail;
+  int           head;
+  int           tail;
 };
-
-const static char *MATCH_TOKEN = "*CLOS*";
 
 class ParsedStream {
 private:  
-  ring_buffer _rx_buffer;
+  ring_buffer   _rx_buffer;
+  unsigned int  bytes_matched;
+  bool          _closed;
+  Stream *      _uart;
 
-  void getByte();
-  void storeByte(unsigned char c);
-
-  unsigned int bytes_matched;
-
-  uint8_t available(bool raw);
-
-  int freeSpace();
-
-  bool _closed;
-
-  Stream* _uart;
+  void          getByte();
+  void          storeByte(unsigned char c);
+  uint8_t       available(bool raw);
+  int           freeSpace();
 
 public:
   ParsedStream();
-  void begin(Stream* theUart);
-  uint8_t available(void);
-  int read(void);
-  int peek(void);
 
-  bool closed();
-
-  void reset();
+  void          begin(Stream* theUart);
+  uint8_t       available();
+  int           read();
+  int           peek();
+  bool          closed();
+  void          reset();
 };
-
 
 #endif

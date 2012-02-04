@@ -47,7 +47,7 @@
   
  */
 
-#define SHIELD_REVISION 3 // Change this value to match your shield revision
+#define SHIELD_REVISION 1 // Change this value to match your shield revision
 
 
 /* -- Do not change anything below this line -- */

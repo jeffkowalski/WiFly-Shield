@@ -1,4 +1,3 @@
-
 #include "ParsedStream.h"
 
 
@@ -15,22 +14,16 @@ void ParsedStream::storeByte(unsigned char c) {
   }
 }
 
-ParsedStream::ParsedStream()
-{
-  /*
-   */
+ParsedStream::ParsedStream() {
   reset();
 }
 
-void ParsedStream::begin(Stream* theUart)
-{
+void ParsedStream::begin(Stream* theUart) {
   _uart = theUart;
 }
 
 void ParsedStream::reset() {
-  /*
-   */
-  ring_buffer _rx_buffer = { { 0 }, 0, 0};
+  _rx_buffer.head = _rx_buffer.tail = _rx_buffer.buffer[0] = 0;
   _closed = false;
   bytes_matched = 0;  
 }
@@ -42,18 +35,16 @@ uint8_t ParsedStream::available(bool raw) {
   available_bytes = (RX_BUFFER_SIZE + _rx_buffer.head - _rx_buffer.tail) % RX_BUFFER_SIZE;
 
   if (!raw) {
-    if (available_bytes > bytes_matched) {
+    if (available_bytes > bytes_matched) 
       available_bytes -= bytes_matched;
-    } else {
+    else
       available_bytes = 0;
-    }
   }
 
   return available_bytes;
 }
 
 uint8_t ParsedStream::available() {
-
   // NOTE: This causes a read/buffer fill which isn't entirely
   //       consistent with how `available()` is normally
   //       handled.
@@ -62,9 +53,8 @@ uint8_t ParsedStream::available() {
   // TODO: Don't refill if we're almost full and don't have a partial
   //       match?
 
-  while (!_closed && freeSpace() && _uart->available()) {
+  while (!_closed && freeSpace() && _uart->available())
     getByte();
-  }
   return available(false);
 }
 
@@ -72,69 +62,62 @@ bool ParsedStream::closed() {
   return _closed && !available();
 }
 
-int ParsedStream::read(void) {
-
-  if (!available()) {
+int ParsedStream::read() {
+  if (!available())
     getByte();
-  }
 
-  if (!available()) {
+  if (!available()) 
     return -1;
-  } else {
+  else {
     unsigned char c = _rx_buffer.buffer[_rx_buffer.tail];
     _rx_buffer.tail = (_rx_buffer.tail + 1) % RX_BUFFER_SIZE;
     return c;
   }
 }
 
-int ParsedStream::peek(void) {
-
-  if (!available()) {
+int ParsedStream::peek() {
+  if (!available()) 
     getByte();
-  }
 
-  if (!available()) {
+  if (!available())
     return -1;
-  } else {
+  else {
     unsigned char c = _rx_buffer.buffer[_rx_buffer.tail];
     return c;
   }
 }
-
-
 
 int ParsedStream::freeSpace() {
   return RX_BUFFER_SIZE - available(true) - 1 /* The -1 fudge due to storeByte calculation*/;
 }
 
 void ParsedStream::getByte() {
-  int c;
-  if (_closed) {
-    return;
-  }
+  const static char *MATCH_TOKEN = "*CLOS*";
 
-  if (freeSpace() == 0) {
+  int c;
+  if (_closed)
     return;
-  }
+
+  if (freeSpace() == 0)
+    return;
   
   // TODO: Tidy this...
   c = _uart->read();
-  if (c == -1) {
+  if (c == -1)
     return;
-  }
 
   if (c == MATCH_TOKEN[bytes_matched]) {
     bytes_matched++;
-    if (bytes_matched == strlen(MATCH_TOKEN)) {
+    if (bytes_matched == strlen(MATCH_TOKEN))
       _closed = true;
-    }
-  } else if (c == MATCH_TOKEN[0]) {
+  }
+  else if (c == MATCH_TOKEN[0]) {
     // Handle e.g. case "**CLOS*"
     bytes_matched = 1;
-  } else {
+  } 
+  else {
     bytes_matched = 0;
   }
 
-  storeByte(c);
-  
+  storeByte(c); 
 }
