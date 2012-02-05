@@ -32,19 +32,17 @@ boolean WiFlyDevice::findInResponse(const char *toMatch,
 }
 
 
-boolean WiFlyDevice::responseMatched(const char *toMatch) {
-  boolean matchFound = true;
-  unsigned long timeout;
+boolean WiFlyDevice::responseMatched (const char *toMatch) {
+  boolean       matchFound = true;
 
   for (unsigned int offset = 0; offset < strlen(toMatch); offset++) {
-    timeout = millis();
+    unsigned long timeout = millis();
     while (!uart->available()) {
-      // Wait, with optional time out.
-      if (millis() - timeout > 5000) {
-          return false;
-        }
+      if (millis() - timeout > 5000)
+        return false;
       delay(1); // This seems to improve reliability slightly
     }
+    
     if (uart->read() != toMatch[offset]) {
       matchFound = false;
       break;
@@ -108,14 +106,10 @@ void  WiFlyDevice::setUart(Stream* newUart) {
   uart = newUart;
 }
 
-boolean WiFlyDevice::begin(boolean adhocMode) {
-  if (!reboot()) return false; // Reboot to get device into known state
-  setConfiguration(adhocMode);
-  return true;
-}
-
 boolean WiFlyDevice::begin() {
-  return begin(false);
+  if (!reboot()) return false; // Reboot to get device into known state
+  setConfiguration();
+  return true;
 }
 
 
@@ -139,7 +133,7 @@ boolean WiFlyDevice::sendCommand(const __FlashStringHelper *command,
   uart->print(command);
   delay(20);
   if (!isMultipartCommand) {
-    uart->flush();
+    //uart->flush();
     uart->println();
     if (!findInResponse(expectedResponse, 1000))
       return false;
@@ -154,7 +148,7 @@ boolean WiFlyDevice::sendCommand(const char *command,
   uart->print(command);
   delay(20);
   if (!isMultipartCommand) {
-    uart->flush();
+    //uart->flush();
     uart->println();
     if (!findInResponse(expectedResponse, 1000))
       return false;
@@ -163,10 +157,8 @@ boolean WiFlyDevice::sendCommand(const char *command,
 }
 
 
-void WiFlyDevice::setConfiguration(boolean adhocMode) {
+void WiFlyDevice::setConfiguration() {
   enterCommandMode();
-
-  sendCommand(F("set wlan join 0")); // Turn off auto-connect
 
   // Set server port
   sendCommand(F("set ip localport "), true);
@@ -175,12 +167,9 @@ void WiFlyDevice::setConfiguration(boolean adhocMode) {
   
   sendCommand(F("set comm remote 0"));  // Turn off remote connect message
   sendCommand(F("set t z 23"));
-  sendCommand(F("set time address 129.6.15.28"));
-  sendCommand(F("set time port 123"));
-  sendCommand(F("set t e 15"));
-
-  sendCommand(F("set wlan auth 2"));
-  sendCommand(F("set ip dhcp 1"));
+  sendCommand(F("set time address 129.6.15.28"));  // time-a.nist.gov	129.6.15.28	NIST, Gaithersburg, Maryland
+  sendCommand(F("set time port 123"));   // 123 matches default
+  sendCommand(F("set time enable 15"));  // fetch time every 15 minutes
 }
 
 

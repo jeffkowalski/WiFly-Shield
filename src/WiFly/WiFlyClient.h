@@ -26,20 +26,16 @@ class WiFlyClient : public Stream {
   bool          connected();
   void          stop();
 
-  operator bool();
+  operator      bool();
 
   uint8_t *     _ip;
   uint16_t      _port;
   const char *  _domain;
 
 private:
-  WiFlyDevice&  _WiFly;
+  WiFlyDevice & _WiFly;
   bool          isOpen;
   ParsedStream  stream;
-
-  // TODO: Work out why alternate instantiation code in
-  //       Server.available() doesn't work and thus requires this:
-  friend class Server;
 };
 
 #endif

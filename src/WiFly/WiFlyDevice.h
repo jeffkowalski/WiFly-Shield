@@ -1,18 +1,14 @@
 #ifndef __WIFLY_DEVICE_H__
 #define __WIFLY_DEVICE_H__
 
-#include "Configuration.h"
-
 #define DEFAULT_SERVER_PORT 80
 
 class WiFlyDevice {
   public:
     WiFlyDevice();
 
-    void setUart(Stream* newUart);
+    void setUart (Stream* newUart);
     boolean begin();
-    boolean begin(boolean adhocMode);
-	boolean createAdHocNetwork(const char *ssid);
 
     boolean join(const char *ssid);
     boolean join(const char *ssid, const char *passphrase, boolean isWPA = true);
@@ -45,8 +41,7 @@ class WiFlyDevice {
     // TODO: Should all methods that need to be in command mode ensure
     //       they are first?
     boolean reboot();
-    void requireFlowControl();
-    void setConfiguration(boolean adhocMode);
+    void setConfiguration();
     boolean sendCommand(const char *command,
                         boolean isMultipartCommand, // Has default value
                         const char *expectedResponse); // Has default value

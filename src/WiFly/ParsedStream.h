@@ -1,5 +1,4 @@
 // Based on ring buffer implementation in `HardwareSerial`.
-// TODO: Do proper license stuff
 
 #ifndef __PARSED_STREAM_H__
 #define __PARSED_STREAM_H__
@@ -19,26 +18,25 @@ struct ring_buffer {
 };
 
 class ParsedStream {
-private:  
-  ring_buffer   _rx_buffer;
-  unsigned int  bytes_matched;
-  bool          _closed;
-  Stream *      _uart;
+  public:
+    ParsedStream();
 
-  void          getByte();
-  void          storeByte(unsigned char c);
-  uint8_t       available(bool raw);
-  int           freeSpace();
+    void          begin (Stream * theUart);
+    uint8_t       available();
+    int           read();
+    int           peek();
+    bool          closed();
+    void          reset();
 
-public:
-  ParsedStream();
+  private:  
+    ring_buffer   _rx_buffer;
+    unsigned int  bytes_matched;
+    bool          _closed;
+    Stream *      _uart;
 
-  void          begin(Stream* theUart);
-  uint8_t       available();
-  int           read();
-  int           peek();
-  bool          closed();
-  void          reset();
+    void          getByte();
+    uint8_t       available (bool raw);
+    int           freeSpace();
 };
 
 #endif

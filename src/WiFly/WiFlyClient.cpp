@@ -32,13 +32,11 @@ size_t  WiFlyClient::write(const uint8_t *buffer, size_t size) {
 
 
 boolean WiFlyClient::connect() {
-  stream.begin(_WiFly.uart);
-
   // Handle case when Null object returned from Server.available()
   if (!this)
     return false;
 
-  // TODO: Implement this better
+  stream.begin(_WiFly.uart);
   stream.reset();
 
   if ((_ip == NULL) && (_domain == NULL)) {
@@ -46,7 +44,6 @@ boolean WiFlyClient::connect() {
     // so the connection is already established.
   }
   else {
-    // TODO: Track state more?
     _WiFly.enterCommandMode();
     
     _WiFly.sendCommand("open ", true, "" /* TODO: Remove this dummy value */);
@@ -126,7 +123,6 @@ void WiFlyClient::stop() {
   //_WiFly.skipRemainderOfResponse();
   // As a result of this, unwanted data gets sent to /dev/null rather than
   // confusing the WiFly which tries to interpret it as commands.
-
   stream.reset();
   _WiFly.uart->flush();
 
